@@ -1,6 +1,6 @@
 # Calendar for Todoist
 
-Simple week view aka Google calendar for Todoist tasks:
+Simple calendar week view for Todoist:
 
 <img src="https://mariuskaz.github.io/images/calendar.png" />
 
@@ -12,7 +12,7 @@ Simple week view aka Google calendar for Todoist tasks:
 npm install
 
 # serve with hot reload at localhost:8080
-npm run dev
+npm run serve
 
 # build for production with minification
 npm run build
