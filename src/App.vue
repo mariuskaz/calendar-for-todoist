@@ -120,10 +120,9 @@ export default {
 
     },
 
-    sync(permanent = false) {
+    sync(wipeData = false) {
 
-      if (permanent) this.tasks = []
-
+      if (wipeData) this.tasks = []
       let id = this.status.person
       if (id == 0) {
         this.status.busy = false
