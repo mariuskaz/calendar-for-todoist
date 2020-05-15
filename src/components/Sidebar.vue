@@ -10,10 +10,10 @@
         <button @click="status.connect=true" class="create" style="positionn:fixed;bottom:30px;margin:0 0 5px">Pridėti</button>
       
       <br><br>
-      <small><a style="cursor:pointer" @click="$emit('sort')" title="Perrikiuoti"><b>Užduotys</b></a><span style="float:right;borderr-radius:50px;background:lightgray;padding:4px 8px;color:gray;">{{ tasks.length }}</span></small>
+      <small><a style="cursor:pointer" @click="sort" title="Perrikiuoti"><b>Užduotys</b></a><span style="float:right;borderr-radius:50px;background:lightgray;padding:4px 8px;color:gray;">{{ activeTasks.length }}</span></small>
       <div class="section" id="taskslist" style="padding:8px 0;height:calc(100vh - 245px);margin-top:5px;border-top:1px solid lightgray;width:100%">
         <div class="todo" draggable="true" @dragstart="drag" 
-          :id="'t'+task.id" v-for="task in tasks" :key="task.id">
+          :id="'t'+task.id" v-for="task in activeTasks" :key="task.id">
               <div style="float:left;height:30px;"><input v-model="task.completed" type="checkbox" @change="checkTask(task)" style="display:inline-block"></div>
               <div style="float:left;width:155px;max-height:28px;overflow:hidden;" 
                 @click="status.taskId = task.id"
@@ -30,7 +30,28 @@
 export default {
     props: ['status','persons', 'tasks'],
     name: 'sidebar',
+
+    data() {
+      return {
+        order: 1
+      }
+    },
+
+    computed: {
+
+      activeTasks() {
+        return this.tasks
+        .filter(task => !task.completed )
+        .sort((a, b) => { return this.order })
+      }
+
+    },
+
     methods: {
+
+      sort() {
+        this.order *= -1
+      },
 
       change() {
         this.status.busy = true

@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <heading :days='days' @today='today' @back='back' @forward='forward' @sync="sync" />
-    <sidebar :persons='persons' :status='status' :tasks="tasks" @sync='sync'  @sort="sortTasks" />
+    <sidebar :persons='persons' :status='status' :tasks="tasks" @sync='sync' />
     <calendar :tasks='tasks' :days='days' :status='status' @addTask="addTask" @dropTask="dropTask" />
     <connect v-if="status.connect" :status="status" :input='input' @add='add' />
     <task v-if="status.taskId > 0" :status="status" :tasks='tasks' :details="details" :projects='projects' :notes='notes' :users='users' />
@@ -120,9 +120,9 @@ export default {
 
     },
 
-    sync(wipeData = false) {
+    sync(wipe = false) {
 
-      if (wipeData) this.tasks = []
+      if (wipe) this.tasks = []
       let id = this.status.person
       if (id == 0) {
         this.status.busy = false
@@ -144,14 +144,14 @@ export default {
 
       todoist.token = this.persons[id].token
       todoist.sync.oncomplete = function(data) {
-        console.log('sync data', data) 
+        console.log('sync data') 
         let user = 'user' + data.user.id,
         items = localStorage[user] ? JSON.parse(localStorage[user]) : {}
         for (let item in items) items[item].completed = true
         items = { ...items, ...data.items }
         getUser(data.user.id, data.user.fullName)
         getProjects(data.projects)
-        getTasks(items, permanent)
+        getTasks(items, wipe)
         getNotes(data.notes)
         getUsers(data.collaborators)
         localStorage.setItem(user, JSON.stringify(items) )
