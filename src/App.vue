@@ -46,10 +46,11 @@ export default {
       input: {
         user: '',
         token: '',
+        color:'#008B8B',
       },
 
       persons: [
-        { name: 'Pasirinkite...' , colors: "https://www.w3schools.com/colors/colors_hex.asp" },
+        { name: 'Pasirinkite...' },
       ],
 
       days: [],
@@ -65,8 +66,9 @@ export default {
   mounted() {
 
     this.today()
-    this.status.person = localStorage.getItem('user') || 0
+    if (localStorage['persons']) this.persons = JSON.parse(localStorage['persons'])
 
+    this.status.person = localStorage.getItem('user') || 0
     if (this.status.person > 0) {
       this.sync()
     } else {
@@ -87,8 +89,9 @@ export default {
 
     add() {
 
-      this.persons.push({ name: this.input.user, token: this.input.token, color: 'crimson'  })
+      this.persons.push({ name: this.input.user, token: this.input.token, color: this.input.color  })
       this.status.person = this.persons.length - 1
+      localStorage.setItem('persons', JSON.stringify(this.persons))
       this.sync()
       this.input.user = ''
       this.input.token = ''
@@ -114,43 +117,6 @@ export default {
           return date.toLocaleDateString()
       })
       if (d > 1) this.status.view += 1
-
-    },
-
-    sync_fetch() {
-      console.log('sync')
-      let id = this.status.person
-      if (id == 0) return
-
-      if (this.persons[id].token.length == 0) {
-        this.tasks = []
-        return
-      }
-
-      let headers = {
-        'Authorization': 'Bearer ' + this.persons[id].token
-      }
-
-      fetch('https://api.todoist.com/rest/v1/tasks', { 
-          headers : headers 
-      })
-
-      .then(response => {
-          return response.json()
-      })
-
-      .then(data => {
-          this.tasks = []
-          this.status.color = this.persons[id].color
-          data.forEach( task => this.tasks.push({ 
-            user: this.persons[id].name, 
-            id: task.id, 
-            content: task.content, 
-            due: task.due,
-            url: task.url
-          }))
-          console.log(data)
-      })
 
     },
 
@@ -180,11 +146,16 @@ export default {
       todoist.token = this.persons[id].token
       todoist.sync.oncomplete = function(data) {
         console.log('sync data', data) 
+        let user = 'user' + data.user.id,
+        items = localStorage[user] ? JSON.parse(localStorage[user]) : {}
+        for (let item in items) items[item].completed = true
+        items = { ...items, ...data.items }
         getUser(data.user.id, data.user.fullName)
         getProjects(data.projects)
-        getTasks(data.items, permanent)
+        getTasks(items, permanent)
         getNotes(data.notes)
         getUsers(data.collaborators)
+        localStorage.setItem(user, JSON.stringify(items) )
       }
 
       todoist.sync()
@@ -203,12 +174,10 @@ export default {
       this.status.color = this.persons[this.status.person].color
       for (let i in items) {
         let item = items[i],
-        duration = 30,
-        completed = false
+        duration = 30
         if (localStorage[item.id]) {
           let data = JSON.parse(localStorage[item.id])
           duration = data.duration || 30
-          completed = data.completed || false
         }
         if (item.responsibleUid == this.status.userId || item.projectId == this.status.inboxId) {
           let desc = item.content
@@ -217,7 +186,7 @@ export default {
             id: item.id, 
             user: username,
             project_id: item.projectId,
-            completed: completed,
+            completed: item.completed,
             content: desc, 
             due: item.due,
             url: "https://todoist.com/showTask?id=" + item.id,
