@@ -4,7 +4,7 @@
     <sidebar :persons='persons' :status='status' :tasks="tasks" @sync='sync' />
     <calendar :tasks='tasks' :days='days' :status='status' @addTask="addTask" @dropTask="dropTask" />
     <connect v-if="status.connect" :status="status" :input='input' @add='add' />
-    <task v-if="status.taskId > 0" :status="status" :tasks='tasks' :details="details" :projects='projects' :notes='notes' :users='users' />
+    <task v-if="status.taskId > 0" :status="status" :tasks='tasks' :details="details" :projects='projects' :notes='notes' :users='users' @updateTask="updateTask"/>
   </div>
 </template>
 
@@ -266,6 +266,34 @@ export default {
 
       .then(response => {
           this.sync()
+      })
+
+
+    },
+
+    updateTask(task) {
+      let id = this.status.person,
+      user = 'user'+this.status.userId
+
+      if (id == 0 || this.persons[id].token.length == 0) return
+
+      let headers = {
+          'Authorization': 'Bearer ' + this.persons[id].token,
+      },
+
+      action = task.completed ? 'close' : 'reopen'
+
+      fetch('https://api.todoist.com/rest/v1/tasks/' + task.id + '/' + action, { 
+          method: 'POST',
+          headers : headers
+      })
+
+      .then(response => {
+          if (!response.ok) console.error('task not updated:', response.status)
+          let items = localStorage[user] ? JSON.parse(localStorage[user]) : {}
+          if (items[task.id] == undefined) items[task.id] = {}
+          items[task.id].completed = task.completed
+          localStorage.setItem(user, JSON.stringify(items) )
       })
 
 

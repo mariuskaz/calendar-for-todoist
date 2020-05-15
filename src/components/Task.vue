@@ -88,8 +88,8 @@ export default {
         },
 
         checkTask() {
-            let data = JSON.stringify({ duration: this.task.duration, completed: this.task.completed })
-            localStorage.setItem(this.task.id, data)
+            let task = { id: this.task.id, completed: this.task.completed }
+            this.$emit('updateTask', task)
         }
     }
 
