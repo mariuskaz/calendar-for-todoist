@@ -222,7 +222,6 @@ export default {
 
     getUsers(items) {
       this.users = {...items}
-      //console.log('users',this.users)
     },
 
     getDay(day = 0) {
@@ -250,8 +249,6 @@ export default {
     addTask(task) {
       let id = this.status.person
       if (id == 0 || this.persons[id].token.length == 0) return
-
-      console.log('add', task.content, task.due_string)
 
       let headers = {
           'Authorization': 'Bearer ' + this.persons[id].token,
@@ -295,7 +292,6 @@ export default {
           items[task.id].completed = task.completed
           localStorage.setItem(user, JSON.stringify(items) )
       })
-
 
     },
 
