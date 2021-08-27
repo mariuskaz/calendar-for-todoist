@@ -1,9 +1,10 @@
 <template>
+<div class="screen">
     <div class="task-dialog">
         <i @click="status.taskId=0" class="material-icons big-icon square" style="position:absolute;right:10px;top:10px;font-size:22pt;;">close</i>
         <div>
             <div vv-if="project"><b>{{ project }}</b><br><br></div>
-            <div style="float:left;height:80px;width:30px;font-weight:bold"><input type="checkbox" v-model="task.completed" @change="checkTask" style="display:inline-block;transform:scale(1.3);"></div>
+            <div style="float:left;height:80px;width:30px;font-weight:bold"><input type="checkbox" v-model="task.completed" @change="checkTask" :style="{ borderColor: priority }" style="display:inline-block;transform:scale(1.3);"></div>
             <div style="font-weight:normal;font-size:big"><a id="tasklink" target="blank" :href="task.url">{{ task.content }}</a></div>
             <div style="margin-top:15px;">
                 <button class="info-label" :style="{ color: color }">{{ due }}</button>
@@ -22,6 +23,7 @@
             </div>
         </div> 
     </div>
+</div>
 </template>
 
 <script>
@@ -53,6 +55,12 @@ export default {
         project() {
             if (this.projects[this.task.project_id]) return this.projects[this.task.project_id].name
             return "not found"
+        },
+
+        priority() {
+            let color = this.task.priority - 1,
+            colors = [ "black", "#246fe0", "#eb8909", "#d1453b" ]
+            return colors[color] || "black"
         },
 
         comments() {
@@ -97,6 +105,15 @@ export default {
 </script>
 
 <style>
+.screen {
+    background:rgba(255,255,255,0);
+    height:100%;
+    width:100%;
+    position:absolute;
+    z-index:99999999;
+    top:0;left:0;right:0;
+}
+
 .task-dialog {
     position:absolute;
     display:inline-block;

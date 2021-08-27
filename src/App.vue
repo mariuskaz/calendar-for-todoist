@@ -195,6 +195,7 @@ export default {
             content: desc, 
             due: item.due,
             url: "https://todoist.com/showTask?id=" + item.id,
+            priority: item.priority,
             duration: duration,
             overflow: false
           })

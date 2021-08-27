@@ -14,7 +14,7 @@
       <div class="section" id="taskslist" style="padding:8px 0;height:calc(100vh - 245px);margin-top:5px;border-top:1px solid lightgray;width:100%">
         <div class="todo" draggable="true" @dragstart="drag" 
           :id="'t'+task.id" v-for="task in activeTasks" :key="task.id">
-              <div style="float:left;height:30px;"><input v-model="task.completed" type="checkbox" @change="checkTask(task)" style="display:inline-block"></div>
+              <div style="float:left;height:30px;"><input v-model="task.completed" type="checkbox" @change="checkTask(task)" :style="{ borderColor: priority(task) }" style="display:inline-block"></div>
               <div style="float:left;width:155px;max-height:28px;overflow:hidden;" 
                 @click="status.taskId = task.id"
                 :class="{ completed: task.completed }"
@@ -77,7 +77,13 @@ export default {
       checkTask(task) {
         let data = JSON.stringify({ duration: task.duration, completed: task.completed })
         localStorage.setItem(task.id, data)
-      }
+      },
+
+      priority(task) {
+        let color = task.priority - 1,
+        colors = [ "black", "#246fe0", "#eb8909", "#d1453b" ]
+        return colors[color] || "black"
+      },
 
     }
 }
