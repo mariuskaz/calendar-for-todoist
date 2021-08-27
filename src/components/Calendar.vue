@@ -114,6 +114,7 @@
 
         <todo v-if="status.new_task" 
             @add="addTask" :status="status" :due="due"/>
+            
         <loading v-if="status.busy" />
 
     </div>

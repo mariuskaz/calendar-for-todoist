@@ -8,14 +8,14 @@
     <span style="margin:0 10px">{{ year }} {{ month }}</span>
     <i  @click="$emit('forward')" class="fa fa-angle-right big-icon"></i>
     <i @click="$emit('forward',7)" class="fa fa-angle-double-right big-icon"></i>
-    <i @click="$emit('sync')" class="fa fa-refresh big-icon" title="Atnaujinti" style="float:right;margin-right:35px;"></i>
-    
+    <i @click="$emit('sync')" class="fa fa-repeat big-icon right" :class="{ 'fa-spinner': status.sync, 'fa-pulse': status.sync }" title="Refresh"></i>
+		<div style="float:right;margin:2px 6px;font-size:x-small;color:gray;line-height:14px;text-align:center">Last sync:<br><b>{{ status.lastSync }}</b></div>
   </div>  
 </template>
 
 <script>
 export default {
-    props: ['days'],
+    props: ['days','status'],
     name: 'heading',
 
     computed: {
@@ -65,4 +65,23 @@ export default {
     border:1px solid #F3F3F3;
     background:whitesmoke;
   }
+
+  .right {
+		float:right; 
+		margin-right:30px;
+    	border-radius: 16px;
+    	width: 22px;
+    	text-align: center;
+	}
+
+	.spinner {
+		/* background: LavenderBlush; */
+		animation: spin 0.6s linear infinite;
+	}
+
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+
 </style>

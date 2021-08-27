@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <heading :days='days' @today='today' @back='back' @forward='forward' @sync="sync" />
+    <heading :days='days' :status='status' @today='today' @back='back' @forward='forward' @sync="sync" />
     <sidebar :persons='persons' :status='status' :tasks="tasks" @sync='sync' />
     <calendar :tasks='tasks' :days='days' :status='status' @addTask="addTask" @dropTask="dropTask" />
     <connect v-if="status.connect" :status="status" :input='input' @add='add' />
@@ -40,7 +40,9 @@ export default {
         taskId: 0,
         inboxId: 0,
         busy: true,
-        new_task: false
+        new_task: false,
+        sync: true,
+                lastSync:'pending'
       },
 
       input: {
@@ -64,16 +66,15 @@ export default {
   },
 
   mounted() {
-
     this.today()
-    if (localStorage['persons']) this.persons = JSON.parse(localStorage['persons'])
 
-    this.status.person = localStorage.getItem('user') || 0
-    if (this.status.person > 0) {
-      this.sync()
-    } else {
-      this.status.busy = false
+    if (localStorage['persons']) {
+      this.persons = JSON.parse(localStorage['persons'])
+      this.status.person = localStorage.getItem('user') || 0
     }
+
+    if (this.status.person > 0)  this.sync()
+      else this.status.busy = false
     
     let status = this.status,
     sync = this.sync
@@ -140,11 +141,13 @@ export default {
       getProjects = this.getProjects,
       getTasks = this.getTasks,
       getNotes = this.getNotes,
-      getUsers = this.getUsers
+      getUsers = this.getUsers,
+      status = this.status
 
       todoist.token = this.persons[id].token
       todoist.sync.oncomplete = function(data) {
-        console.log('sync data') 
+
+        console.log('sync...') 
         let user = 'user' + data.user.id,
         items = localStorage[user] ? JSON.parse(localStorage[user]) : {}
         for (let item in items) items[item].completed = true
@@ -155,8 +158,11 @@ export default {
         getNotes(data.notes)
         getUsers(data.collaborators)
         localStorage.setItem(user, JSON.stringify(items) )
+        status.lastSync = new Date().toLocaleTimeString()
+                status.sync = false
       }
 
+      status.sync = true
       todoist.sync()
 
     },

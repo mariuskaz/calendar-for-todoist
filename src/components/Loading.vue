@@ -13,6 +13,7 @@
 	top:0;bottom:0;
 	margin:auto;
 	position:absolute;
+	padding-left:250px;
  }
 
  .loading-circle {
