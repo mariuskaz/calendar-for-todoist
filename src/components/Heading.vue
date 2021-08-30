@@ -19,12 +19,16 @@ export default {
     name: 'heading',
 
     computed: {
+    
       year() {
         return new Date(this.days[2]).getFullYear()
       },
+
       month() {
-        const day = new Date(this.days[2])
-        return day.toLocaleString('default', { month: 'long' })
+        const today = new Date,
+        day =  today.getDay(),
+        date = new Date(this.days[1 - day])
+        return date.toLocaleString('default', { month: 'long' })
       }
     },
 
