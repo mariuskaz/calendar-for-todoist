@@ -30,10 +30,11 @@ export default {
         date = new Date(this.days[day - 1])
         return date.toLocaleString('default', { month: 'long' })
       }
+      
     },
 
     updated() {
-        document.title = "Todoist kalendorius - " + this.year + " " + this.month
+        document.title = "Todoist kalendorius"
     },
 }
 </script>
