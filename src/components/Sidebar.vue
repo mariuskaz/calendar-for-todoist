@@ -54,7 +54,6 @@ export default {
       },
 
       change() {
-        this.status.busy = true
         localStorage.setItem('user', this.status.person)
         this.$emit('sync', true)
       },
