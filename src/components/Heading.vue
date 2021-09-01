@@ -3,11 +3,11 @@
     <img style="height:30px;vertical-align:middle;margin-right:8px" src="todoist.png">
     <a style="margin-right:40px;colorr:#E44332" href="https://todoist.com" target="_blank">todoist</a>
     <button @click="$emit('today')" class="aaction" style="margin-right:20px;vertical-align:middle">Šiandien</button>
-    <i @click="$emit('back',7)" class="fa fa-angle-double-left big-icon"></i>
-    <i @click="$emit('back')" class="fa fa-angle-left big-icon"></i>
+    <i @click="$emit('view',-7)" class="fa fa-angle-double-left big-icon"></i>
+    <i @click="$emit('view',-1)" class="fa fa-angle-left big-icon"></i>
     <span style="margin:0 10px">{{ year }} {{ month }}</span>
-    <i  @click="$emit('forward')" class="fa fa-angle-right big-icon"></i>
-    <i @click="$emit('forward',7)" class="fa fa-angle-double-right big-icon"></i>
+    <i  @click="$emit('view',1)" class="fa fa-angle-right big-icon"></i>
+    <i @click="$emit('view',7)" class="fa fa-angle-double-right big-icon"></i>
     <i @click="$emit('sync')" class="fa fa-repeat big-icon right" :class="{ 'fa-spinner': status.sync, 'fa-pulse': status.sync }" title="Refresh"></i>
 		<div style="float:right;margin:2px 6px;font-size:x-small;color:gray;line-height:14px;text-align:center">Last sync:<br><b>{{ status.lastSync }}</b></div>
   </div>  

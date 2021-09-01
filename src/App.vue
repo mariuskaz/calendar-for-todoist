@@ -1,9 +1,9 @@
 <template>
 	<div id="app">
-		<heading :days='days' :status='status' @today='today' @back='back' @forward='forward' @sync="sync" />
+		<heading :days='days' :status='status' @today='today' @view='view' @sync="sync" />
 		<sidebar :persons='persons' :status='status' :tasks="tasks" @sync='sync' />
 		<calendar :tasks='tasks' :days='days' :status='status' @addTask="addTask" @dropTask="dropTask" />
-		<connect v-if="status.connect" :status="status" :input='input' @add='add' />
+		<connect v-if="status.connect" :status="status" :input='input' @add='addUser' />
 		<task v-if="status.taskId > 0" :status="status" :tasks='tasks' :details="details" :projects='projects' :notes='notes' :users='users' @updateTask="updateTask"/>
 	</div>
 </template>
@@ -88,36 +88,31 @@ export default {
 
 	methods: {
 
-		add() {
+		today() {
 
-			this.persons.push({ name: this.input.user, token: this.input.token, color: this.input.color  })
-			this.status.person = this.persons.length - 1
-			localStorage.setItem('persons', JSON.stringify(this.persons))
-			this.sync()
-			this.input.user = ''
-			this.input.token = ''
-			
-		},
-
-		back(d = 1) {
-
-			this.days = this.days.map(day => {
-					let date = new Date(day)
-					date.setDate(date.getDate() - d)
-					return date.toLocaleDateString()
-			})
-			if (d > 1) this.status.view += 1
+			let date = new Date,
+			day = date.getDay()
+			this.days = [
+				this.getDay(1 - day),
+				this.getDay(2 - day),
+				this.getDay(3 - day),
+				this.getDay(4 - day),
+				this.getDay(5 - day),
+			]
+			this.status.view += 1
 
 		},
 
-		forward(d = 1) {
+		view(d = 1) {
 
 			this.days = this.days.map(day => {
 					let date = new Date(day)
 					date.setDate(date.getDate() + d)
 					return date.toLocaleDateString()
 			})
-			if (d > 1) this.status.view += 1
+
+			if (d < -1 || d > 1) 
+				this.status.view += 1
 
 		},
 
@@ -129,7 +124,7 @@ export default {
 			let id = this.status.person,
 			todoist = new Todoist(),
 			update = this.update
-			this.status.busy = true
+
 			todoist.token = this.persons[id].token || 'none'
 			todoist.sync.oncomplete = function(data) {
 				console.log('sync...') 
@@ -141,7 +136,9 @@ export default {
 				localStorage.setItem(user, JSON.stringify(data.items))
 			}
 
+			
 			this.status.sync = true
+			if (wipe) this.status.busy = true
 			todoist.sync()
 
 		},
@@ -174,14 +171,19 @@ export default {
 				duration = 30
 
 				if (localStorage[item.id]) {
-					let data = JSON.parse(localStorage[item.id])
-					duration = data.duration || 30
+					let stored = JSON.parse(localStorage[item.id])
+					duration = stored.duration || 30
 				}
 
-				if (item.responsibleUid == this.status.userId || item.projectId == this.status.inboxId) {
+				if (item.responsibleUid == this.status.userId 
+					|| item.projectId == this.status.inboxId) {
+
 					let desc = item.content
-					if (desc.indexOf('[') == 0 && desc.indexOf('](' != -1)) desc = desc.split('](')[0].substring(1)
+					if (desc.indexOf('[') == 0 && desc.indexOf('](' != -1)) 
+						desc = desc.split('](')[0].substring(1)
+
 					this.tasks.push({ 
+
 						id: item.id, 
 						user: this.status.userName,
 						project_id: item.projectId,
@@ -192,13 +194,15 @@ export default {
 						priority: item.priority,
 						duration: duration,
 						overflow: false
+
 					})
 				}
 			}
 
 			this.tasks.sort((a, b) => {
 				if (a.due && b.due) {
-					let delta = new Date(a.due.date) - new Date(b.due.date)
+					let delta = 
+						new Date(a.due.date) - new Date(b.due.date)
 					return delta > 0 ? 1 : -1
 				} else if (a.due) {
 					return -1
@@ -213,25 +217,21 @@ export default {
 			this.status.sync = false
 		},
 
+		addUser() {
+
+			this.persons.push({ name: this.input.user, token: this.input.token, color: this.input.color  })
+			this.status.person = this.persons.length - 1
+			localStorage.setItem('persons', JSON.stringify(this.persons))
+			this.sync()
+			this.input.user = ''
+			this.input.token = ''
+			
+		},
+
 		getDay(day = 0) {
 
 			let date = new Date
 			return new Date(date.setDate(date.getDate() + day)).toLocaleDateString()
-
-		},
-
-		today() {
-
-			let date = new Date,
-			day = date.getDay()
-			this.days = [
-				this.getDay(1 - day),
-				this.getDay(2 - day),
-				this.getDay(3 - day),
-				this.getDay(4 - day),
-				this.getDay(5 - day),
-			]
-			this.status.view += 1
 
 		},
 
