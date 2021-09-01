@@ -117,26 +117,19 @@ export default {
 		},
 
 		sync(wipe = false) {
-
+		
 			if (wipe) this.tasks = []
 			if (this.status.person == 0) return
 			
-			let id = this.status.person,
-			todoist = new Todoist(),
-			update = this.update
-
+			let view = this,
+			id = this.status.person,
+			todoist = new Todoist()
 			todoist.token = this.persons[id].token || 'none'
 			todoist.sync.oncomplete = function(data) {
-				console.log('sync...') 
-				let user = 'user' + data.user.id,
-				items = localStorage[user] ? JSON.parse(localStorage[user]) : {}
-				for (let item in items) items[item].completed = true
-				data.items = { ...items, ...data.items }
-				update(data, wipe)
-				localStorage.setItem(user, JSON.stringify(data.items))
+				view.update(data, wipe)
 			}
 
-			
+			console.log('sync...') 
 			this.status.sync = true
 			if (wipe) this.status.busy = true
 			todoist.sync()
@@ -145,10 +138,18 @@ export default {
 
 		update(data, permanent = false) {
 
+			let user = 'user' + data.user.id,
+			items = localStorage[user] ? JSON.parse(localStorage[user]) : {}
+
+			for (let item in items) 
+				items[item].completed = true
+
+			data.items = { ...items, ...data.items }
+			localStorage.setItem(user, JSON.stringify(data.items))
+			
 			this.status.userId = data.user.id
 			this.status.userName = data.user.fullName
 			this.status.color = this.persons[this.status.person].color
-
 			this.projects = {...data.projects}
 			this.users = {...data.collaborators}
 			this.tasks = []
