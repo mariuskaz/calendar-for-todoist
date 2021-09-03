@@ -155,7 +155,7 @@ export default {
 			this.tasks = []
 			this.notes = []
 
-      		for (let item in data.notes) 
+			for (let item in data.notes) 
 				this.notes.push(data.notes[item])
 
 			for (let id in this.projects) {
