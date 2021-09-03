@@ -2,7 +2,7 @@
   <div class="header">
     <img style="height:30px;vertical-align:middle;margin-right:8px" src="todoist.png">
     <a style="margin-right:40px;colorr:#E44332" href="https://todoist.com" target="_blank">todoist</a>
-    <button @click="$emit('today')" class="aaction" style="margin-right:20px;vertical-align:middle">Šiandien</button>
+    <button @click="$emit('today')" class="aaction" style="margin-right:20px;vertical-align:middle">{{ translate.today }}</button>
     <i @click="$emit('view',-7)" class="fa fa-angle-double-left big-icon"></i>
     <i @click="$emit('view',-1)" class="fa fa-angle-left big-icon"></i>
     <span style="margin:0 10px">{{ year }} {{ month }}</span>
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    props: ['days','status'],
+    props: ['days','status','translate'],
     name: 'heading',
 
     computed: {
@@ -33,9 +33,6 @@ export default {
       
     },
 
-    updated() {
-        document.title = "Todoist kalendorius"
-    },
 }
 </script>
 

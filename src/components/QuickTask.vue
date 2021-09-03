@@ -1,12 +1,12 @@
 <template>
     <div class="todo-dialog">
         <i @click="status.new_task = false" class="material-icons big-icon square" style="position:absolute;right:10px;top:10px;font-size:22pt;;">close</i>
-        Nauja užduotis<br>
+        {{ translate.new}}<br>
         <input id="todo" v-model="todo" type="text" style="width:300px;margin-top:5px"
             @keyup.enter="add" @keyup.escape="status.new_task = false"/>
         <div class="todo-footer">
-            <button @click="add" class="create">PRIDĖTI</button>
-            <!-- button @click="status.new_task = false">BAIGTI</button -->
+            <button @click="add" class="create">{{ translate.add }}</button>
+            <!-- button @click="status.new_task = false">{{ translate.close}}</button -->
 
             <button style="float:right">{{ due }}</button>
         </div>
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-    props:['status', 'due'],
+    props:['status','due','translate'],
     name: 'todo',
     data() {
         return {

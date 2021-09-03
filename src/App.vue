@@ -1,10 +1,10 @@
 <template>
 	<div id="app">
-		<heading :days='days' :status='status' @today='today' @view='view' @sync="sync" />
-		<sidebar :persons='persons' :status='status' :tasks="tasks" @sync='sync' />
-		<calendar :tasks='tasks' :days='days' :status='status' @addTask="addTask" @dropTask="dropTask" />
-		<connect v-if="status.connect" :status="status" :input='input' @add='addUser' />
-		<task v-if="status.taskId > 0" :status="status" :tasks='tasks' :details="details" :projects='projects' :notes='notes' :users='users' @updateTask="updateTask"/>
+		<heading :days='days' :status='status' :translate='translate' @today='today' @view='redraw' @sync="sync" />
+		<sidebar :persons='persons' :status='status' :tasks="tasks" :translate='translate' @sync='sync' />
+		<calendar :tasks='tasks' :days='days' :status='status' :translate='translate' @addTask="addTask" @dropTask="dropTask" />
+		<connect v-if="status.connect" :status="status" :input='input' :translate='translate' @add='addUser' />
+		<task v-if="status.taskId > 0" :status="status" :tasks='tasks' :details="details" :projects='projects' :notes='notes' :users='users' :translate='translate' @updateTask="updateTask"/>
 	</div>
 </template>
 
@@ -29,6 +29,7 @@ export default {
 
 	data() {
 		return {
+
 			status: {
 				active: true,
 				view: 1,
@@ -42,7 +43,7 @@ export default {
 				busy: true,
 				new_task: false,
 				sync: true,
-								lastSync:'pending'
+				lastSync:'pending'
 			},
 
 			input: {
@@ -55,6 +56,36 @@ export default {
 				{ name: 'Pasirinkite...' },
 			],
 
+			dictionary: {
+
+				'en': {
+					add: 'Add',
+					connect: 'Connect',
+					close: 'Close',
+					new: 'New task',
+					tasks: 'Tasks',
+					today: 'Today',
+					token: 'Todoist API token',
+					user: 'User',
+					refresh: 'Refresh',
+					weekDays: [ 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ]
+				},
+
+				'lt': {
+					add: 'Pridėti',
+					connect: 'Įtraukti',
+					close: 'Baigti',
+					new: 'Nauja užduotis',
+					tasks: 'Užduotys',
+					today: 'Šiandien',
+					token: 'Todoist raktas',
+					user: 'Darbuotojas',
+					refresh: 'Atnaujinti',
+					weekDays: [ 'sekmadienis', 'pirmadienis' , 'antradienis', 'trečiadienis', 'ketvirtadienis', 'penktadienis', 'šeštadienis' ]
+				},
+
+			},
+
 			days: [],
 			tasks: [],
 			details: {},
@@ -62,6 +93,14 @@ export default {
 			notes: [],
 			users: {},
 
+		}
+	},
+
+	computed: {
+		translate() {
+			let lang = navigator.language.substring(0,2).toLowerCase(),
+			dict = this.dictionary[lang] || this.dictionary['en']
+			return dict
 		}
 	},
 
@@ -103,7 +142,7 @@ export default {
 
 		},
 
-		view(d = 1) {
+		redraw(d = 1) {
 
 			this.days = this.days.map(day => {
 					let date = new Date(day)

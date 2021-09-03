@@ -1,16 +1,16 @@
 <template>
     <div class="sidebar">
       
-      <small>Darbuotojas:</small>
+      <small>{{ translate.user }}:</small>
       <div class="section" style="margin-top:0px">
         <select v-model="status.person" @change="change" class="select">
           <option v-for='(person, id) in persons' :key='id' :value="id">{{ person.name }}</option>
         </select>
         </div>
-        <button @click="status.connect=true" class="create" style="positionn:fixed;bottom:30px;margin:0 0 5px">Pridėti</button>
+        <button @click="status.connect=true" class="create" style="positionn:fixed;bottom:30px;margin:0 0 5px">{{ translate.add }}</button>
       
       <br><br>
-      <small><a style="cursor:pointer" @click="sort" title="Perrikiuoti"><b>Užduotys</b></a><span style="float:right;borderr-radius:50px;background:lightgray;padding:4px 8px;color:gray;">{{ activeTasks.length }}</span></small>
+      <small><a style="cursor:pointer" @click="sort" title="Sort tasks"><b>{{ translate.tasks }}</b></a><span style="float:right;borderr-radius:50px;background:lightgray;padding:4px 8px;color:gray;">{{ activeTasks.length }}</span></small>
       <div class="section" id="taskslist" style="padding:8px 0;height:calc(100vh - 245px);margin-top:5px;border-top:1px solid lightgray;width:100%">
         <div class="todo" draggable="true" @dragstart="drag" 
           :id="'t'+task.id" v-for="task in activeTasks" :key="task.id">
@@ -28,7 +28,7 @@
 
 <script>
 export default {
-    props: ['status','persons', 'tasks'],
+    props: ['status','persons','tasks','translate'],
     name: 'sidebar',
 
     data() {

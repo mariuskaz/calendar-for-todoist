@@ -112,8 +112,8 @@
         
       </div>
 
-        <todo v-if="status.new_task" 
-            @add="addTask" :status="status" :due="due"/>
+        <todo v-if="status.new_task && status.person > 0" 
+            @add="addTask" :status="status" :due="due" :translate='translate' />
             
         <loading v-if="status.busy" />
 
@@ -126,22 +126,18 @@ import ruler from './Ruler.vue'
 import todo from './QuickTask.vue'
 import loading from './Loading.vue'
 export default {
-    props: ['days', 'tasks', 'status'],
     name: 'calendar',
-    components: {
-        todo,
-        ruler,
-        loading,
-    },
+    props: ['tasks','status','days','translate'],
+    components: { todo, ruler, loading },
+    
     data() {
         return {
+
             hours: 17,
-            weekdays: [
-                'sekmadienis', 'pirmadienis', 'antradienis', 'trečiadienis', 'ketvirtadienis', 'penktadienis', 'šeštadienis'
-            ],
             draggable: true,
             point: 0,
             due: "today",
+
             touch: {
                 activeTask: 0,
                 startdrag: new Function,
@@ -157,7 +153,6 @@ export default {
 
     methods: {
 
-        /* put overflow check to App->getTasks() */
         isOverflow(day, hour, todo) {
             hour += 6
             let current = new Date(todo.due.date),
@@ -221,8 +216,13 @@ export default {
         },
 
         getWeekDay(dateString) {
-            return this.weekdays[new Date(dateString).getDay()]
+            return this.translate.weekDays[new Date(dateString).getDay()]
         },        
+
+        getWeekDaysNames() {
+            let date = new Date(),
+            weekday = date.toLocaleString("default", { weekday: "long" })
+        },
 
         isToday(d) {
             return new Date(d).toLocaleDateString() == new Date().toLocaleDateString()

@@ -1,26 +1,28 @@
 <template>
     <div class="dialog">
         <i @click="status.connect=false" class="material-icons big-icon square" style="position:absolute;right:10px;top:10px;font-size:22pt;;">close</i>
-        <label>Darbuotojas</label><br>
+        <label>{{ translate.user }}</label><br>
         <input v-model="input.user" id='user' type="text" style="width:130px" />
         <input v-model="input.color" id='color' type="color" style="width:20px;vertical-align:bottom;" />
         <br><br><br>
-        <label>Todoist raktas</label><br>
+        <label>{{ translate.token }}</label><br>
         <input v-model="input.token" type="text" style="width:300px"/>
         <div class="footer">
-            <button @click="connect" class="create">ĮTRAUKTI</button>
-            <button @click="status.connect=false">BAIGTI</button>
+            <button @click="connect" class="create">{{ translate.connect }}</button>
+            <button @click="status.connect=false" class="cancel">{{ translate.close }}</button>
         </div>
     </div>
 </template>
 
 <script>
 export default {
-    props:['status','input'],
+    props:['status','input','translate'],
     name: 'connect',
+
     mounted() {
         document.getElementById('user').focus()
     },
+
     methods: {
         connect() {
             this.$emit('add')
@@ -50,6 +52,10 @@ export default {
     position:absolute;
     bottom:30px;
     padding-bottom:20px;
+}
+
+.cancel {
+    text-transform: uppercase;
 }
 
 </style>
