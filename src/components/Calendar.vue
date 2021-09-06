@@ -92,7 +92,7 @@
                             background: setColor(task),
                             position: 'absolute',
                             height: setHeight(task),
-                            marginTop: setPosition(task),
+                            marginTop: setPosition(d, h, task),
                         }" 
 
                         :id="task.id" 
@@ -186,10 +186,11 @@ export default {
             return task.duration * 26 / 30 - 1  + "px"
         },
 
-        setPosition(task) {
+        setPosition(d,h,task) {
             let pos = Math.floor(new Date(task.due.date).getMinutes()*50/60)
-            if (pos > 0) pos += 1
-            return pos + 'px'
+			if (pos > 0) pos += 1
+			if (this.isOverflow(d,h,task)) pos += 10
+			return pos + 'px'
         },
 
         allDayTasks(day) {
