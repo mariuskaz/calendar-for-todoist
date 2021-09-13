@@ -25,9 +25,7 @@ export default {
       },
 
       month() {
-        const today = new Date,
-        day =  today.getDay(),
-        date = new Date(this.days[day - 1])
+        const date = new Date(this.days[0])
         return date.toLocaleString('default', { month: 'long' })
       }
       
