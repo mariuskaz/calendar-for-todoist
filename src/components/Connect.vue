@@ -3,7 +3,7 @@
         <i @click="status.connect=false" class="material-icons big-icon square" style="position:absolute;right:10px;top:10px;font-size:22pt;;">close</i>
         <label>{{ translate.user }}</label><br>
         <input v-model="input.user" id='user' type="text" style="width:130px" />
-        <input v-model="input.color" id='color' type="color" style="width:20px;vertical-align:bottom;" />
+        <input v-model="input.color" id='color' type="color" style="width:26px;vertical-align:bottom;" />
         <br><br><br>
         <label>{{ translate.token }}</label><br>
         <input v-model="input.token" type="text" style="width:300px"/>

@@ -15,8 +15,6 @@ import calendar from './components/Calendar.vue'
 import connect from './components/Connect.vue'
 import task from './components/Task.vue'
 
-var Todoist = require('exports-loader?Todoist!./todoist.js')
-
 export default {
 	name: 'app',
 	components: {
@@ -53,7 +51,7 @@ export default {
 			},
 
 			persons: [
-				{ name: 'Pasirinkite...' },
+				{ name: 'Pasirinkite...', token: 'none', color: 'red' },
 			],
 
 			dictionary: {
@@ -162,16 +160,37 @@ export default {
 			
 			let view = this,
 			id = this.status.person,
-			todoist = new Todoist()
-			todoist.token = this.persons[id].token || 'none'
-			todoist.sync.oncomplete = function(data) {
-				view.update(data, wipe)
-			}
+			controller = new AbortController(),
+        	signal = controller.signal,
+			url = "https://api.todoist.com/sync/v9/sync",
 
+			headers = {
+				'Authorization': 'Bearer ' + this.persons[id].token,
+				'Content-Type': 'application/json',
+			},
+	
+			params = {
+				sync_token: '*',
+				resource_types: ["user","items","projects","collaborators","notes"]
+			}
+        
 			console.log('sync...') 
+
 			this.status.sync = true
 			if (wipe) this.status.busy = true
-			todoist.sync()
+	
+			fetch(url, { 
+				method: 'POST',
+				headers : headers,
+				body: JSON.stringify(params),
+				signal
+			})
+		
+			.then(res => {
+				res.json().then(data => {
+					view.update(data, wipe)
+				})
+			})
 
 		},
 
@@ -185,23 +204,20 @@ export default {
 
 			data.items = { ...items, ...data.items }
 			localStorage.setItem(user, JSON.stringify(data.items))
-			
+
 			this.status.userId = data.user.id
-			this.status.userName = data.user.fullName
+			this.status.inboxId = data.user.inbox_project_id
+			this.status.userName = data.user.full_name
 			this.status.color = this.persons[this.status.person].color
-			this.projects = {...data.projects}
-			this.users = {...data.collaborators}
+
+			this.projects = {}
+			this.users = {}
 			this.tasks = []
 			this.notes = []
 
-			for (let item in data.notes) 
-				this.notes.push(data.notes[item])
-
-			for (let id in this.projects) {
-				let project = this.projects[id].name
-				if (project == 'Inbox') 
-					this.status.inboxId = id
-			}
+			data.projects.forEach( project => this.projects[project.id] = project.name )
+			data.notes.forEach( note => this.notes.push(note) )
+			data.collaborators.forEach( user => this.users[user.id] = user )
 
 			if (permanent) 
 				document.getElementById('taskslist').scrollTop = 0
@@ -215,8 +231,8 @@ export default {
 					duration = stored.duration || 30
 				}
 
-				if (item.responsibleUid == this.status.userId 
-					|| item.projectId == this.status.inboxId) {
+				if (item.responsible_uid == this.status.userId 
+					|| item.project_id == this.status.inboxId) {
 
 					let desc = item.content
 					if (desc.indexOf('[') == 0 && desc.indexOf('](' != -1)) 
@@ -226,7 +242,7 @@ export default {
 
 						id: item.id, 
 						user: this.status.userName,
-						project_id: item.projectId,
+						project_id: item.project_id,
 						completed: item.completed,
 						content: desc, 
 						due: item.due,
@@ -284,7 +300,7 @@ export default {
 					'Content-Type': 'application/json'
 			}
 
-			fetch('https://api.todoist.com/rest/v1/tasks', { 
+			fetch('https://api.todoist.com/rest/v2/tasks', { 
 					method: 'POST',
 					headers : headers,
 					body: JSON.stringify(task)
@@ -309,7 +325,7 @@ export default {
 
 			action = task.completed ? 'close' : 'reopen'
 
-			fetch('https://api.todoist.com/rest/v1/tasks/' + task.id + '/' + action, { 
+			fetch('https://api.todoist.com/rest/v2/tasks/' + task.id + '/' + action, { 
 					method: 'POST',
 					headers : headers
 			})
@@ -339,7 +355,7 @@ export default {
 				due_string: date
 			}
 
-			fetch('https://api.todoist.com/rest/v1/tasks/' + taskId, { 
+			fetch('https://api.todoist.com/rest/v2/tasks/' + taskId, { 
 					method: 'POST',
 					headers : headers,
 					body: JSON.stringify(data)

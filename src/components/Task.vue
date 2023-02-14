@@ -18,7 +18,7 @@
         <div class="empty" v-if="comments.length==0">No comments</div>
         <div class="notes">
             <div class="note" v-for="comment in comments" :key="comment.id">
-                <p><b>{{ users[comment.postedUid].fullName }}</b></p>
+                <p><b>{{ users[comment.posted_uid].full_name }}</b></p>
                 <div v-html="getNotes(comment.content)"/>
             </div>
         </div> 
@@ -53,8 +53,7 @@ export default {
         },
         
         project() {
-            if (this.projects[this.task.project_id]) return this.projects[this.task.project_id].name
-            return "not found"
+            return this.projects[this.task.project_id] || "not found"
         },
 
         priority() {
@@ -64,7 +63,7 @@ export default {
         },
 
         comments() {
-            return this.notes.filter( note => { return note.itemId == this.status.taskId })
+            return this.notes.filter( note => { return note.item_id == this.status.taskId })
         },
 
         commentsNo() {
